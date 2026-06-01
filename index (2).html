@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的未来校园</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+  background:#0f0f0f;color:#f5f5f5;
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%;
+}
+.screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;padding:32px 20px;
+}
+.screen.active{display:flex}
+
+.c-person{background:linear-gradient(135deg,#35b0ab,#2a9590)}
+.c-object{background:linear-gradient(135deg,#c5f0a4,#a8d88a)}
+.c-place{background:linear-gradient(135deg,#faffb8,#e8eda0)}
+.c-future{background:linear-gradient(135deg,#b388ff,#7c4dff)}
+.s-person{background:#35b0ab}
+.s-object{background:#c5f0a4}
+.s-place{background:#faffb8}
+.s-future{background:#9d6dff}
+.t-person{color:#35b0ab}
+.t-object{color:#c5f0a4}
+.t-place{color:#faffb8}
+.t-future{color:#b388ff}
+
+.title{font-size:40px;font-weight:900;letter-spacing:4px;margin-bottom:20px}
+.tags{display:flex;gap:8px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
+.tag{
+  padding:8px 16px;border-radius:24px;font-size:14px;font-weight:700;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.tag.s-person{color:#fff}
+.tag.s-object{color:#1a3a1a}
+.tag.s-place{color:#3a3a1a}
+.tag.s-future{color:#fff}
+.tag-sub{font-size:10px;font-weight:400;opacity:.75}
+.subtitle{font-size:15px;color:#888;text-align:center;line-height:1.8;margin-bottom:48px}
+
+.btn{
+  padding:16px 52px;border:none;border-radius:40px;
+  font-size:18px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:transform .15s;
+}
+.btn:active{transform:scale(.96)}
+.btn-w{background:#fff;color:#0f0f0f}
+.btn-g{background:#1e1e1e;color:#f5f5f5;border:1px solid #333}
+.btn-s{padding:12px 28px;font-size:14px}
+
+.hint{font-size:15px;color:#888;margin-bottom:28px;text-align:center}
+.slots{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin-bottom:28px}
+.slot{
+  height:70px;border-radius:16px;position:relative;
+  border:2px dashed #333;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.slot.filled{border:none}
+.slot-label{font-size:14px;color:#444}
+.card{
+  position:absolute;inset:0;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:21px;font-weight:700;
+  padding:0 16px;text-align:center;
+}
+.card.c-person{color:#fff}
+.card.c-object{color:#1a3a1a}
+.card.c-place{color:#3a3a1a}
+.card.c-future{color:#fff}
+.card-tag{position:absolute;top:8px;left:12px;font-size:11px;font-weight:400;opacity:.8}
+.draw-btns{display:flex;flex-direction:column;gap:10px;align-items:center}
+.draw-btn{
+  width:230px;padding:12px 0;border:none;border-radius:16px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+}
+.draw-btn.s-person{color:#fff}
+.draw-btn.s-object{color:#1a3a1a}
+.draw-btn.s-place{color:#3a3a1a}
+.draw-btn.s-future{color:#fff}
+.draw-btn:disabled{opacity:.3;cursor:default}
+.draw-btn:active:not(:disabled){transform:scale(.95)}
+.next-wrap{margin-top:24px;display:none}
+.next-wrap.show{display:block}
+
+.r-label{font-size:13px;color:#888;letter-spacing:6px;margin-bottom:24px}
+.r-cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin-bottom:20px}
+.r-card{
+  height:78px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;position:relative;
+  padding:0 16px;text-align:center;
+}
+.r-card.c-person{color:#fff}
+.r-card.c-object{color:#1a3a1a}
+.r-card.c-place{color:#3a3a1a}
+.r-card.c-future{color:#fff}
+.r-combo{
+  font-size:26px;font-weight:900;text-align:center;margin-bottom:32px;line-height:1.5;
+}
+.r-times{font-size:18px;color:#555;margin:0 5px}
+
+/* Guide Card */
+.guide{
+  width:100%;max-width:340px;
+  background:#1a1a1a;border:1px solid #333;border-radius:16px;
+  padding:24px 20px;margin-bottom:32px;
+}
+.guide-title{
+  font-size:15px;font-weight:700;margin-bottom:16px;
+  color:#fff;text-align:center;letter-spacing:2px;
+}
+.guide-item{margin-bottom:14px}
+.guide-item:last-child{margin-bottom:0}
+.guide-q{
+  font-size:14px;font-weight:700;color:#ddd;margin-bottom:4px;
+  line-height:1.5;display:flex;align-items:flex-start;gap:8px;
+}
+.guide-num{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:#333;color:#aaa;font-size:12px;font-weight:700;
+  text-align:center;line-height:22px;margin-top:1px;
+}
+.guide-text{flex:1}
+.guide-sub{font-size:12px;color:#666;line-height:1.5;margin-top:3px}
+
+.btn-row{display:flex;gap:12px;margin-top:8px}
+
+@keyframes cardIn{
+  from{transform:scale(.7) rotateY(90deg);opacity:0}
+  to{transform:scale(1) rotateY(0);opacity:1}
+}
+.card-anim{animation:cardIn .45s ease}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.screen.active{animation:fadeUp .35s ease}
+</style>
+</head>
+<body>
+
+<!-- Screen: Start -->
+<div id="s-start" class="screen active">
+  <div class="title">我的未来校园</div>
+  <div class="tags">
+    <span class="tag s-person">人</span>
+    <span class="tag s-object">物</span>
+    <span class="tag s-place">场</span>
+    <span class="tag s-future">未来场景</span>
+  </div>
+  <div class="subtitle">从四个盒子各抽一张牌<br>在真实的人、物、场上<br>叠加一个未来设定</div>
+  <button class="btn btn-w" onclick="go('s-draw')">开始抽卡</button>
+</div>
+
+<!-- Screen: Draw -->
+<div id="s-draw" class="screen">
+  <div class="hint">点击下方按钮，从每个盒子抽一张牌</div>
+  <div class="slots">
+    <div class="slot" id="slot-person"><span class="slot-label">人</span></div>
+    <div class="slot" id="slot-object"><span class="slot-label">物</span></div>
+    <div class="slot" id="slot-place"><span class="slot-label">场</span></div>
+    <div class="slot" id="slot-future"><span class="slot-label">未来场景</span></div>
+  </div>
+  <div class="draw-btns">
+    <button class="draw-btn s-person" id="db-person" onclick="draw('person')">抽 · 人</button>
+    <button class="draw-btn s-object" id="db-object" onclick="draw('object')">抽 · 物</button>
+    <button class="draw-btn s-place" id="db-place" onclick="draw('place')">抽 · 场</button>
+    <button class="draw-btn s-future" id="db-future" onclick="draw('future')">抽 · 未来场景</button>
+  </div>
+  <div class="next-wrap" id="next-wrap">
+    <button class="btn btn-w" onclick="cfm()">生成组合</button>
+  </div>
+</div>
+
+<!-- Screen: Result -->
+<div id="s-result" class="screen">
+  <div class="r-label">你 的 组 合</div>
+  <div class="r-cards" id="r-cards"></div>
+  <div class="r-combo" id="r-combo"></div>
+  <div class="guide" id="guide-box"></div>
+  <div class="btn-row">
+    <button class="btn btn-g btn-s" onclick="restart()">重新抽卡</button>
+  </div>
+</div>
+
+<script>
+var D={
+  person:[
+    "刷手机的人","赶时间的人","闲逛的人","东张西望的人","搬运东西的人",
+    "坐着不动的人","结伴的人","独处的人","吃东西的人","蚊子",
+    "拍照/录像的人","排队的人","迷路/犹豫的人","清洁/维护的人","保安",
+    "食堂阿姨","快递小哥","猫","狗","鸟",
+    "遛弯的人","小孩","外国人","睡着的人","打电话的人",
+    "戴耳机的人","跑步的人","骑自行车的人","抽烟的人","自拍的人",
+    "找东西的人","骑电动车的人","写作业的人","背很重书包的人","打伞的人",
+    "拖行李箱的人","穿拖鞋的人","外卖骑手","蟑螂","环卫工人",
+    "情侣","老人","孕妇","遛狗的人","发传单的人",
+    "提着咖啡/奶茶的人","建筑工人","校外人员","宿管阿姨"
+  ],
+  object:[
+    "长椅/座椅","垃圾桶","连廊","共享单车","手机",
+    "雨伞","书包/行李","门/闸机","台阶","告示牌/标识",
+    "饮水机/售卖机","插座","快递包裹","水瓶/饮料杯","盆栽/绿植",
+    "外卖柜","充电桩","窗户","路灯","监控摄像头",
+    "电梯","快递柜","井盖","消防栓","减速带",
+    "垃圾分类标识","钥匙/校园卡","自行车锁","外卖车/电动车","公告栏/海报墙",
+    "标志物（火箭、教训石等）","打印机","镜子","水龙头","烟头/烟灰缸",
+    "树/开花的树","耳机","旗杆","雨棚","伞架",
+    "校园巴士","花坛","草坪"
+  ],
+  place:[
+    "食堂","教学楼走廊","图书馆","宿舍楼下","校门口",
+    "架空层","快递站","便利店","操场边","天桥/连廊",
+    "校巴站","花园/绿地","停车棚","楼梯间","屋顶/露台",
+    "体育馆","打印店","自习室","教室后排","校医院",
+    "宿舍公共区域","电梯间","篮球场","足球场","校园超市",
+    "咖啡店","教学楼大厅","实验室","校园主干道","校园小路",
+    "宿舍阳台","卫生间门口","自行车停放区","快递柜旁","垃圾站旁",
+    "校园围墙边","教学楼天台","树荫下","坡道/斜坡","地下通道",
+    "校园广场"
+  ],
+  future:[
+    "自适应气候","反重力","悬浮","跨星球文化","跨物种交流",
+    "元宇宙","全息交互","虚拟现实","人机共生","脑电链接",
+    "时空穿梭","虫洞接驳","量子加速"
+  ]
+};
+var L={person:"人",object:"物",place:"场",future:"未来场景"};
+var T=["person","object","place","future"];
+var drawn={};
+
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+function go(id){
+  var ss=document.querySelectorAll('.screen');
+  for(var i=0;i<ss.length;i++) ss[i].classList.remove('active');
+  var el=document.getElementById(id);
+  el.classList.add('active');
+  el.style.animation='none';
+  el.offsetHeight;
+  el.style.animation='';
+}
+
+function draw(t){
+  if(drawn[t]) return;
+  var w=pick(D[t]);
+  drawn[t]=w;
+  var slot=document.getElementById('slot-'+t);
+  slot.classList.add('filled');
+  slot.innerHTML='<div class="card c-'+t+' card-anim"><span class="card-tag">'+L[t]+'</span>'+w+'</div>';
+  document.getElementById('db-'+t).disabled=true;
+  var all=true;
+  for(var i=0;i<T.length;i++){if(!drawn[T[i]])all=false}
+  if(all) document.getElementById('next-wrap').classList.add('show');
+}
+
+function cfm(){
+  var rc=document.getElementById('r-cards');
+  var combo=document.getElementById('r-combo');
+  rc.innerHTML='';
+  var parts=[];
+  for(var i=0;i<T.length;i++){
+    var t=T[i];
+    var d=document.createElement('div');
+    d.className='r-card c-'+t;
+    d.innerHTML='<span class="card-tag">'+L[t]+'</span>'+drawn[t];
+    rc.appendChild(d);
+    parts.push('<span class="t-'+t+'">'+drawn[t]+'</span>');
+  }
+  combo.innerHTML=parts.join('<span class="r-times">×</span>');
+  buildGuide();
+  go('s-result');
+}
+
+function buildGuide(){
+  var box=document.getElementById('guide-box');
+  box.innerHTML=
+    '<div class="guide-title">畅想卡</div>'+
+    gItem(1,'这个未来设定，会怎样改变这个场景？')+
+    gItem(2,'在这个未来里，人、物、场之间的关系发生了什么变化？')+
+    gItem(3,'这个变化会带来什么新的问题、冲突或可能性？')+
+    gItem(4,'如果要讲一个发生在这个未来场景里的小故事，会是什么？');
+}
+function gItem(n,q){
+  return '<div class="guide-item"><div class="guide-q"><span class="guide-num">'+n+'</span><span class="guide-text">'+q+'</span></div></div>';
+}
+
+function restart(){
+  drawn={};
+  for(var i=0;i<T.length;i++){
+    var t=T[i];
+    var slot=document.getElementById('slot-'+t);
+    slot.classList.remove('filled');
+    slot.innerHTML='<span class="slot-label">'+L[t]+'</span>';
+    document.getElementById('db-'+t).disabled=false;
+  }
+  document.getElementById('next-wrap').classList.remove('show');
+  go('s-draw');
+}
+</script>
+</body>
+</html>
